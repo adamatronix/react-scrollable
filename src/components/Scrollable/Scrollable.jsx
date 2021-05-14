@@ -3,7 +3,7 @@ import cx from 'classnames/bind';
 import styles from './styles/scrollable.module.scss';
 
 const Scrollable = props => {
-    const { children, trackStyles, autoHide } = props;
+    const { children, trackStyles, autoHide, hideTime } = props;
     const [ handleSize, setHandleSize ] = useState(null);
     const [ handlePos, setHandlePos ] = useState(0);
     const [ NoScroll, setNoScroll ] = useState(true);
@@ -14,6 +14,7 @@ const Scrollable = props => {
     const scrollElement = useRef();
     const maxHandlePos = useRef();
     const totalScrollable = useRef();
+    const timer = useRef(null);
     
 
     useEffect(() => {
@@ -52,10 +53,31 @@ const Scrollable = props => {
     function onScroll(e) {
       let locationInPercent = e.target.scrollTop / totalScrollable.current;
       setHandlePos(locationInPercent * maxHandlePos.current);
+      if(hideTime)
+        onMouseMove();
     }
 
     function onResize() {
       calculate();
+    }
+
+    function setTimer(delay) {
+      timer.current = setTimeout(function() {
+        setHide(true);
+      }, delay);
+    }
+
+    function destroyTimer() {
+      if(timer.current)
+        clearTimeout(timer.current);
+    }
+
+    function onMouseMove() {
+      destroyTimer();
+      if(autoHide) {
+        setHide(false);
+        setTimer(hideTime);
+      }
     }
 
     function onMouseEnter() {
@@ -77,7 +99,7 @@ const Scrollable = props => {
     });
 
     return (
-      <div className={styles.wrapper} ref={scrollElement} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <div className={styles.wrapper} ref={scrollElement} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseMove={hideTime ? onMouseMove : null}>
         <div className={styles.inner} ref={scrollAreaElement}>
           <div ref={scrollContentElement}>
             { children }

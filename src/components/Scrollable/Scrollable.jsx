@@ -15,6 +15,7 @@ const Scrollable = props => {
     const scrollElement = useRef();
     const maxHandlePos = useRef();
     const totalScrollable = useRef();
+    const isDraggingHandle = useRef(null);
     const timer = useRef(null);
     
 
@@ -80,8 +81,20 @@ const Scrollable = props => {
       let onHandle = isOnHandle(adjustedClientY);
       if(!onHandle) {
         scrollToHandlePos(adjustedClientY);
+      } else {
+        isDraggingHandle.current = { initial: e.clientY, initialHandle: handlePos };
       }
+    }
 
+    function onDragMove(e) {
+      if(isDraggingHandle.current) {
+        let difference = e.clientY - isDraggingHandle.current.initial;
+        scrollToHandlePos(isDraggingHandle.current.initialHandle + difference);
+      }
+    }
+
+    function onDragStop(e) {
+      isDraggingHandle.current = null;
     }
 
     function onResize() {
@@ -134,8 +147,8 @@ const Scrollable = props => {
         </div>
         <DraggableCore 
           onStart={onDragStart}
-          onDrag={(e) => console.log(e)}
-          onStop={(e) => console.log('stop')}
+          onDrag={onDragMove}
+          onStop={onDragStop}
         >
           <div className={stylesScroll}>
             <div style={trackStyles}className={styles['scroll-track']} ref={scrollTrackElement}> 

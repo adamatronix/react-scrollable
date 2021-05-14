@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import cx from 'classnames/bind';
+import { DraggableCore } from 'react-draggable';
 import styles from './styles/scrollable.module.scss';
 
 const Scrollable = props => {
@@ -105,11 +106,17 @@ const Scrollable = props => {
             { children }
           </div>
         </div>
-        <div className={stylesScroll}>
-          <div style={trackStyles}className={styles['scroll-track']} ref={scrollTrackElement}> 
-            <div className={styles['scroll-handle']} style={{height: `${handleSize}px`, transform: `translate(0,${handlePos}px)`, cursor: 'pointer', ...handleStyles}}></div>
+        <DraggableCore 
+          onStart={() => console.log('start')}
+          onDrag={(e) => console.log(e)}
+          onStop={(e) => console.log('stop')}
+        >
+          <div className={stylesScroll}>
+            <div style={trackStyles}className={styles['scroll-track']} ref={scrollTrackElement}> 
+              <div className={styles['scroll-handle']} style={{height: `${handleSize}px`, transform: `translate(0,${handlePos}px)`, cursor: 'pointer', ...handleStyles}}></div>
+            </div>
           </div>
-        </div>
+        </DraggableCore>
       </div>
     );
 }

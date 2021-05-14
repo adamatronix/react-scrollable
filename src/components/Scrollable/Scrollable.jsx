@@ -4,7 +4,7 @@ import { DraggableCore } from 'react-draggable';
 import styles from './styles/scrollable.module.scss';
 
 const Scrollable = props => {
-    const { children, wrapperStyles, trackStyles, handleStyles, autoHide, hideTime } = props;
+    const { children, onScollCallback, wrapperStyles, trackStyles, handleStyles, autoHide, hideTime } = props;
     const [ handleSize, setHandleSize ] = useState(null);
     const [ handlePos, setHandlePos ] = useState(0);
     const [ NoScroll, setNoScroll ] = useState(true);
@@ -57,6 +57,9 @@ const Scrollable = props => {
       setHandlePos(locationInPercent * maxHandlePos.current);
       if(hideTime)
         onMouseMove();
+      
+      if(onScollCallback) 
+        onScollCallback(e);
     }
 
     function scrollToHandlePos(pos) {

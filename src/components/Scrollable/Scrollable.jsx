@@ -22,7 +22,8 @@ const Scrollable = props => {
     
 
       return function cleanup() {
-        scrollAreaElement.current.removeEventListener('scroll', onScroll);
+        if(scrollAreaElement.current) 
+          scrollAreaElement.current.removeEventListener('scroll', onScroll);
         window.removeEventListener('resize', onResize);
       };
     },[]);

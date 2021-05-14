@@ -3,7 +3,7 @@ import cx from 'classnames/bind';
 import styles from './styles/scrollable.module.scss';
 
 const Scrollable = props => {
-    const { children, trackStyles, handleStyles, autoHide, hideTime } = props;
+    const { children, wrapperStyles, trackStyles, handleStyles, autoHide, hideTime } = props;
     const [ handleSize, setHandleSize ] = useState(null);
     const [ handlePos, setHandlePos ] = useState(0);
     const [ NoScroll, setNoScroll ] = useState(true);
@@ -99,7 +99,7 @@ const Scrollable = props => {
     });
 
     return (
-      <div className={styles.wrapper} ref={scrollElement} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseMove={hideTime ? onMouseMove : null}>
+      <div className={styles.wrapper} style={wrapperStyles} ref={scrollElement} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseMove={hideTime ? onMouseMove : null}>
         <div className={styles.inner} ref={scrollAreaElement}>
           <div ref={scrollContentElement}>
             { children }

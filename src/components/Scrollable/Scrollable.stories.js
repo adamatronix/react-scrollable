@@ -39,6 +39,7 @@ export const AutoHide = () => (
 export const Restyled = () => (
   <div style={{width: '300px', height: '40vh'}}>
         <Scrollable 
+          wrapperStyles={{paddingRight: ' 5px'}}
           trackStyles={{width: '1px', backgroundColor: '#000'}} 
           handleStyles={{width: '3px', left: '-1px'}}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce cursus id ex eu cursus. Fusce nec luctus urna. Mauris ac leo commodo magna laoreet bibendum. Pellentesque ut justo nec urna tincidunt mattis ac vitae nulla. Vivamus in pellentesque leo, sit amet ultricies sem. Nulla varius, lectus vitae eleifend volutpat, metus libero maximus neque, et lacinia mi nibh non ex. Donec imperdiet, diam sit amet rutrum placerat, nunc sapien congue nibh, in euismod nisi sem in nisi. Aenean elementum risus lacus, quis mollis neque rutrum et. Fusce fringilla metus et purus egestas, at lobortis est pretium. Praesent sollicitudin nulla eu odio posuere facilisis. Vivamus ornare commodo nisl, sed tempus ipsum lobortis maximus. Quisque a justo tincidunt, rhoncus felis sit amet, vehicula eros. Vivamus pulvinar elit et lobortis tristique.

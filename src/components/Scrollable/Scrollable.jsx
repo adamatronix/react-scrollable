@@ -58,6 +58,32 @@ const Scrollable = props => {
         onMouseMove();
     }
 
+    function scrollToHandlePos(pos) {
+      let locationInPercent;
+      if(pos <= maxHandlePos.current) {
+        locationInPercent = pos / maxHandlePos.current;
+      } else {
+        locationInPercent = 1;
+      }
+      
+      let scrollPos = locationInPercent * totalScrollable.current;
+      scrollAreaElement.current.scrollTop = scrollPos;
+
+    }
+
+    function isOnHandle(pos) {
+      return (handlePos <= pos && pos <= (handlePos + handleSize)) || false;
+    }
+
+    function onDragStart(e) {
+      let adjustedClientY = e.clientY - scrollElement.current.getBoundingClientRect().y;
+      let onHandle = isOnHandle(adjustedClientY);
+      if(!onHandle) {
+        scrollToHandlePos(adjustedClientY);
+      }
+
+    }
+
     function onResize() {
       calculate();
     }
@@ -107,7 +133,7 @@ const Scrollable = props => {
           </div>
         </div>
         <DraggableCore 
-          onStart={() => console.log('start')}
+          onStart={onDragStart}
           onDrag={(e) => console.log(e)}
           onStop={(e) => console.log('stop')}
         >

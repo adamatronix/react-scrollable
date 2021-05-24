@@ -4,7 +4,7 @@ import { DraggableCore } from 'react-draggable';
 import styles from './styles/scrollable.module.scss';
 
 const Scrollable = props => {
-    const { children, onScollCallback, wrapperStyles, trackStyles, handleStyles, autoHide, hideTime } = props;
+    const { children, onScollCallback, wrapperStyles, trackStyles, handleStyles, autoHide, hideTime, scrollTo } = props;
     const [ handleSize, setHandleSize ] = useState(null);
     const [ handlePos, setHandlePos ] = useState(0);
     const [ NoScroll, setNoScroll ] = useState(true);
@@ -23,7 +23,9 @@ const Scrollable = props => {
       scrollAreaElement.current.addEventListener('scroll', onScroll);
       window.addEventListener('resize', onResize);
     
-
+      if(scrollTo)
+        scrollAreaElement.current.scrollTop = scrollTo;
+        
       return function cleanup() {
         if(scrollAreaElement.current) 
           scrollAreaElement.current.removeEventListener('scroll', onScroll);

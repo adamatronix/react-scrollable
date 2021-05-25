@@ -22,7 +22,6 @@ const Scrollable = props => {
     useEffect(() => {
       scrollAreaElement.current.addEventListener('scroll', onScroll);
       window.addEventListener('resize', onResize);
-    
       if(scrollTo)
         scrollAreaElement.current.scrollTop = scrollTo;
         
@@ -31,7 +30,7 @@ const Scrollable = props => {
           scrollAreaElement.current.removeEventListener('scroll', onScroll);
         window.removeEventListener('resize', onResize);
       };
-    },[]);
+    },[scrollTo]);
 
     useEffect(() => {
       calculate();

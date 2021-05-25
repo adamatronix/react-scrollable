@@ -11,6 +11,8 @@ var _react = _interopRequireWildcard(require("react"));
 
 var _bind = _interopRequireDefault(require("classnames/bind"));
 
+var _reactDraggable = require("react-draggable");
+
 var _scrollableModule = _interopRequireDefault(require("./styles/scrollable.module.scss"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -18,6 +20,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -35,8 +41,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var Scrollable = function Scrollable(props) {
   var children = props.children,
+      onScollCallback = props.onScollCallback,
+      wrapperStyles = props.wrapperStyles,
       trackStyles = props.trackStyles,
-      autoHide = props.autoHide;
+      handleStyles = props.handleStyles,
+      autoHide = props.autoHide,
+      hideTime = props.hideTime,
+      scrollTo = props.scrollTo;
 
   var _useState = (0, _react.useState)(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -64,11 +75,14 @@ var Scrollable = function Scrollable(props) {
   var scrollElement = (0, _react.useRef)();
   var maxHandlePos = (0, _react.useRef)();
   var totalScrollable = (0, _react.useRef)();
+  var isDraggingHandle = (0, _react.useRef)(null);
+  var timer = (0, _react.useRef)(null);
   (0, _react.useEffect)(function () {
     scrollAreaElement.current.addEventListener('scroll', onScroll);
     window.addEventListener('resize', onResize);
+    if (scrollTo) scrollAreaElement.current.scrollTop = scrollTo;
     return function cleanup() {
-      scrollAreaElement.current.removeEventListener('scroll', onScroll);
+      if (scrollAreaElement.current) scrollAreaElement.current.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
     };
   }, []);
@@ -93,10 +107,73 @@ var Scrollable = function Scrollable(props) {
   function onScroll(e) {
     var locationInPercent = e.target.scrollTop / totalScrollable.current;
     setHandlePos(locationInPercent * maxHandlePos.current);
+    if (hideTime) onMouseMove();
+    if (onScollCallback) onScollCallback(e);
+  }
+
+  function scrollToHandlePos(pos) {
+    var locationInPercent;
+
+    if (pos <= maxHandlePos.current) {
+      locationInPercent = pos / maxHandlePos.current;
+    } else {
+      locationInPercent = 1;
+    }
+
+    var scrollPos = locationInPercent * totalScrollable.current;
+    scrollAreaElement.current.scrollTop = scrollPos;
+  }
+
+  function isOnHandle(pos) {
+    return handlePos <= pos && pos <= handlePos + handleSize || false;
+  }
+
+  function onDragStart(e) {
+    var adjustedClientY = e.clientY - scrollElement.current.getBoundingClientRect().y;
+    var onHandle = isOnHandle(adjustedClientY);
+
+    if (!onHandle) {
+      scrollToHandlePos(adjustedClientY);
+    } else {
+      isDraggingHandle.current = {
+        initial: e.clientY,
+        initialHandle: handlePos
+      };
+    }
+  }
+
+  function onDragMove(e) {
+    if (isDraggingHandle.current) {
+      var difference = e.clientY - isDraggingHandle.current.initial;
+      scrollToHandlePos(isDraggingHandle.current.initialHandle + difference);
+    }
+  }
+
+  function onDragStop(e) {
+    isDraggingHandle.current = null;
   }
 
   function onResize() {
     calculate();
+  }
+
+  function setTimer(delay) {
+    timer.current = setTimeout(function () {
+      setHide(true);
+    }, delay);
+  }
+
+  function destroyTimer() {
+    if (timer.current) clearTimeout(timer.current);
+  }
+
+  function onMouseMove() {
+    destroyTimer();
+
+    if (autoHide) {
+      setHide(false);
+      setTimer(hideTime);
+    }
   }
 
   function onMouseEnter() {
@@ -118,15 +195,21 @@ var Scrollable = function Scrollable(props) {
   var stylesScroll = (0, _bind.default)(_scrollableModule.default['scroll-wrapper'], _defineProperty({}, _scrollableModule.default['scroll-wrapper--hide'], Hide || NoScroll ? true : false));
   return /*#__PURE__*/_react.default.createElement("div", {
     className: _scrollableModule.default.wrapper,
+    style: wrapperStyles,
     ref: scrollElement,
     onMouseEnter: onMouseEnter,
-    onMouseLeave: onMouseLeave
+    onMouseLeave: onMouseLeave,
+    onMouseMove: hideTime ? onMouseMove : null
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: _scrollableModule.default.inner,
     ref: scrollAreaElement
   }, /*#__PURE__*/_react.default.createElement("div", {
     ref: scrollContentElement
-  }, children)), /*#__PURE__*/_react.default.createElement("div", {
+  }, children)), /*#__PURE__*/_react.default.createElement(_reactDraggable.DraggableCore, {
+    onStart: onDragStart,
+    onDrag: onDragMove,
+    onStop: onDragStop
+  }, /*#__PURE__*/_react.default.createElement("div", {
     className: stylesScroll
   }, /*#__PURE__*/_react.default.createElement("div", {
     style: trackStyles,
@@ -134,11 +217,12 @@ var Scrollable = function Scrollable(props) {
     ref: scrollTrackElement
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: _scrollableModule.default['scroll-handle'],
-    style: {
+    style: _objectSpread({
       height: "".concat(handleSize, "px"),
-      transform: "translate(0,".concat(handlePos, "px)")
-    }
-  }))));
+      transform: "translate(0,".concat(handlePos, "px)"),
+      cursor: 'pointer'
+    }, handleStyles)
+  })))));
 };
 
 var _default = Scrollable;

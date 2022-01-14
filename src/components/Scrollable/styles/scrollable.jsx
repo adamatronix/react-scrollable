@@ -1,43 +1,41 @@
-.wrapper {
+import styled from 'styled-components';
+
+export const Wrapper = styled.div`
   position: relative;
   height: 100%;
   width: 100%;
   box-sizing: border-box;
-}
+`
 
-.inner {
+export const Inner = styled.div`
   height: 100%;
   overflow-y: scroll;
 
   &::-webkit-scrollbar {
     display: none;
   }
-}
+`
 
-.scroll-wrapper {
+export const ScrollWrapper = styled.div`
   position: absolute;
   height: 100%;
   width: 2px;
   right: 0;
   top: 0;
-  opacity: 1;
   transition: opacity .2s ease;
+  opacity: ${props => props.hide ? '0' : '1'};
+`
 
-  &--hide {
-    opacity: 0;
-  }
-}
-
-.scroll-track {
+export const ScrollTrack = styled.div`
   position: absolute;
   width: 100%;
   top: 0;
   right: 0;
   bottom: 0;
-}
+`
 
-.scroll-handle {
+export const ScrollHandle = styled.div`
   position: absolute;
   width: 100%;
   background: #444444;
-}
+`

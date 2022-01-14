@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import cx from 'classnames/bind';
 import { DraggableCore } from 'react-draggable';
-import styles from './styles/scrollable.module.scss';
+import { Wrapper, Inner, ScrollWrapper, ScrollTrack, ScrollHandle } from './styles/scrollable';
 
 const Scrollable = props => {
     const { children, onScollCallback, wrapperStyles, trackStyles, handleStyles, autoHide, hideTime, scrollTo } = props;
@@ -137,30 +136,25 @@ const Scrollable = props => {
         setHide(true);
       }
     }
-
-    const stylesScroll = cx(styles['scroll-wrapper'], {
-      [styles['scroll-wrapper--hide']]: Hide || NoScroll ? true : false
-    });
-
     return (
-      <div className={styles.wrapper} style={wrapperStyles} ref={scrollElement} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseMove={hideTime ? onMouseMove : null}>
-        <div className={styles.inner} ref={scrollAreaElement}>
+      <Wrapper style={wrapperStyles} ref={scrollElement} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseMove={hideTime ? onMouseMove : null}>
+        <Inner ref={scrollAreaElement}>
           <div ref={scrollContentElement}>
             { children }
           </div>
-        </div>
+        </Inner>
         <DraggableCore 
           onStart={onDragStart}
           onDrag={onDragMove}
           onStop={onDragStop}
         >
-          <div className={stylesScroll}>
-            <div style={trackStyles}className={styles['scroll-track']} ref={scrollTrackElement}> 
-              <div className={styles['scroll-handle']} style={{height: `${handleSize}px`, transform: `translate(0,${handlePos}px)`, cursor: 'pointer', ...handleStyles}}></div>
-            </div>
-          </div>
+          <ScrollWrapper hide={Hide || NoScroll ? true : false}>
+            <ScrollTrack style={trackStyles} ref={scrollTrackElement}> 
+              <ScrollHandle style={{height: `${handleSize}px`, transform: `translate(0,${handlePos}px)`, cursor: 'pointer', ...handleStyles}}></ScrollHandle>
+            </ScrollTrack>
+          </ScrollWrapper>
         </DraggableCore>
-      </div>
+      </Wrapper>
     );
 }
 
